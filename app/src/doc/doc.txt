@@ -1,0 +1,25 @@
+
+/*************************2017.09.10*****************************/
+一.Git使用
+    1) 文件右键commit
+    2) 工具栏 VCS -> Git -> Push
+
+二.预览 Camera 总结
+1.GLSurfaceView 预览 Camera
+SurfaceTexture texture = new SurfaceTexture(int textureId);
+camera.setPreviewTexture(SurfaceTexture texture);
+
+2.SurfaceView 预览 Camera
+camera.setPreviewDisplay(SurfaceHolder holder);
+
+3.TextureView 预览 Camera
+camera.setPreviewTexture(SurfaceTexture texture);
+
+4.GLSurfaceView 预览 Camera
+     1)Camera --> SurfaceTexture --> Texture --> GLRender --> GLSurfaceView
+     2)使 Camera 的数据与显示分离
+     3)SurfaceTexture是数据与显示之间的桥梁。
+
+三.相机预览内容继续绘制贴纸层
+
+/*************************Date*****************************/
