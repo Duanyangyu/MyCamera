@@ -18,6 +18,10 @@ import java.security.Permission;
 /**
  * Created by Duanyy on 2017/9/10.
  */
+
+/**
+ * commit test from Mac.
+ */
 public class MyCameraActivity extends FragmentActivity {
 
     private static final int RESULT_CODE_CAMERA = 2001;
