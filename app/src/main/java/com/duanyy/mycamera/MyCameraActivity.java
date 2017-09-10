@@ -12,7 +12,6 @@ import android.support.v4.content.PermissionChecker;
 import com.duanyy.mycamera.camera.CameraGLSurfaceview;
 import com.duanyy.mycamera.utils.PermissionHelper;
 
-import java.security.Permission;
 
 
 /**
