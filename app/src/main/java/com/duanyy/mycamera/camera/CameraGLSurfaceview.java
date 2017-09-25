@@ -84,10 +84,10 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
     }
 
     public void openCamera() {
-        mCamera = Camera.open(0);
         try {
+            mCamera = Camera.open(0);
             mCamera.setPreviewTexture(mSurfaceTexture);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         startPreview(1.f);

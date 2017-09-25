@@ -16,13 +16,29 @@ public class MainActivity extends Activity {
 
     private void initView(){
         findViewById(R.id.mBtnCamera).setOnClickListener(mClickLfistener);
+        findViewById(R.id.mBtnPicture).setOnClickListener(mClickLfistener);
     }
 
     private View.OnClickListener mClickLfistener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(MainActivity.this, MyCameraActivity.class);
-            startActivity(intent);
+            if (view != null) {
+                int id = view.getId();
+                Intent intent = new Intent();
+                switch (id){
+                    case R.id.mBtnPicture:
+                        intent.setClass(MainActivity.this,PictureActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.mBtnCamera:
+                        intent.setClass(MainActivity.this,MyCameraActivity.class);
+                        startActivity(intent);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
         }
     };
 }
