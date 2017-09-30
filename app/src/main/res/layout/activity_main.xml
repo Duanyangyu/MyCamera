@@ -10,11 +10,7 @@
     android:orientation="vertical"
     tools:context="com.duanyy.mycamera.MainActivity">
 
-    <Button
-        android:id="@+id/mBtnPicture"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Picture"/>
+
 
     <Button
         android:id="@+id/mBtnCamera"
@@ -22,4 +18,19 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="Camera"/>
+
+    <Button
+        android:id="@+id/mBtnPicture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Picture"/>
+
+    <Button
+        android:id="@+id/mBtnCube"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cube"/>
+
+
+
 </LinearLayout>

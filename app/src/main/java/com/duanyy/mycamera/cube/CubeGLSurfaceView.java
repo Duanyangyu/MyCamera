@@ -1,4 +1,4 @@
-package com.duanyy.mycamera.picture;
+package com.duanyy.mycamera.cube;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
@@ -10,45 +10,48 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 /**
- * Created by duanyy on 2017/9/25.
+ * Created by duanyy on 2017/9/30.
  */
 
-public class PictureGLSurfaceView extends GLSurfaceView implements GLSurfaceView.Renderer {
+public class CubeGLSurfaceView extends GLSurfaceView implements GLSurfaceView.Renderer {
 
-    private static final String TAG = "PictureGLSurfaceView";
+    private static final String TAG = "CubeGLSurfaceView";
 
     private Context mContext;
-    private Picture mPicture;
+    private Cube mCube;
 
-    public PictureGLSurfaceView(Context context, AttributeSet attrs) {
+    public CubeGLSurfaceView(Context context) {
+        this(context,null);
+    }
+
+    public CubeGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.mContext = context;
         init();
     }
 
     private void init(){
-        mPicture = new Picture();
-
+        mCube = new Cube();
 
         setEGLContextClientVersion(2);
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
-
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        mPicture.init();
-        mPicture.setBitmap(getResources(), R.mipmap.icon_test);
+        mCube.init();
+        mCube.setBitmap(getResources(), R.mipmap.icon_test);
+        mCube.onSurfaceCreated();
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-
+        mCube.onSurfaceChanged(width,height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        mPicture.draw();
+        mCube.draw();
     }
 }

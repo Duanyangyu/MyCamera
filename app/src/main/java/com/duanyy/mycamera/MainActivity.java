@@ -17,6 +17,7 @@ public class MainActivity extends Activity {
     private void initView(){
         findViewById(R.id.mBtnCamera).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnPicture).setOnClickListener(mClickLfistener);
+        findViewById(R.id.mBtnCube).setOnClickListener(mClickLfistener);
     }
 
     private View.OnClickListener mClickLfistener = new View.OnClickListener() {
@@ -32,6 +33,10 @@ public class MainActivity extends Activity {
                         break;
                     case R.id.mBtnCamera:
                         intent.setClass(MainActivity.this,MyCameraActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.mBtnCube:
+                        intent.setClass(MainActivity.this,CubeActivity.class);
                         startActivity(intent);
                         break;
                     default:

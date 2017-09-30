@@ -18,9 +18,12 @@ import java.nio.ShortBuffer;
  * Created by duanyy on 2017/9/25.
  */
 
-public class PictureRender {
+/**
+ * 绘制一张图片到glsurfaceview
+ */
+public class Picture {
 
-    private static final String TAG = "PictureRender";
+    private static final String TAG = "Picture";
 
     private static final String VERTIX_SHADER = "uniform mat4 u_MVPMatrix; " +
             "attribute vec3 a_position;" +
@@ -35,7 +38,7 @@ public class PictureRender {
     private static final String FRAGMENT_SHADER = "precision mediump float;" +
             "varying vec2 v_textCoord;"+
             "uniform sampler2D u_sampleTexture;"+
-            "void main() {" +
+            "void main(){" +
             "  gl_FragColor = texture2D(u_sampleTexture,v_textCoord);" +
             "}";
 
@@ -53,7 +56,7 @@ public class PictureRender {
     };
 
     private static final float[] FRAGMENT_ARRAY_2 = {
-            0f,0f,  0f,1f,  1f,0f, 1f,0f
+            0f,0f,  0f,1f,  1f,0f, 1f,1f
     };
 
     private static final short[] VERTEX_ORDER = {
@@ -71,7 +74,7 @@ public class PictureRender {
     private ShortBuffer mVertexOrderBuffer;
     private int mTextureId;
 
-    public PictureRender() {
+    public Picture() {
 
     }
 
@@ -96,22 +99,30 @@ public class PictureRender {
             return;
         }
 
+        int positionHandler = GLES20.glGetAttribLocation(mProgramId, "a_position");
+        int textureHandler = GLES20.glGetAttribLocation(mProgramId, "a_textCoord");
+        int sampleTextureHandler = GLES20.glGetUniformLocation(mProgramId, "u_sampleTexture");
+        Log.e(TAG,"positionHandler="+positionHandler);
+        Log.e(TAG,"textCoordHandler="+textureHandler);
+
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT|GLES20.GL_COLOR_BUFFER_BIT);
 
         GLES20.glUseProgram(mProgramId);
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,mTextureId);
+        GLES20.glUniform1i(sampleTextureHandler,0);
 
-        GLES20.glEnableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId, "a_position"));
-        GLES20.glEnableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId,"a_textCoord"));
 
-        GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(mProgramId, "a_position"),2,GLES20.GL_FLOAT,false,0,mVertexBuffer);
-        GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(mProgramId, "a_textCoord"),2,GLES20.GL_FLOAT,false,0,mFragmentBuffer);
+        GLES20.glEnableVertexAttribArray(positionHandler);
+        GLES20.glEnableVertexAttribArray(textureHandler);
+
+        GLES20.glVertexAttribPointer(positionHandler,2,GLES20.GL_FLOAT,false,0,mVertexBuffer);
+        GLES20.glVertexAttribPointer(textureHandler,2,GLES20.GL_FLOAT,false,0,mFragmentBuffer);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES,0,6);
-//        GLES20.glDrawElements(GLES20.GL_TRIANGLES,6,GLES20.GL_UNSIGNED_SHORT,mVertexOrderBuffer);
+//        GLES20.glDrawElements(GLES20.GL_TRIANGLES,4,GLES20.GL_UNSIGNED_SHORT,mVertexOrderBuffer);
 
-        GLES20.glDisableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId, "a_position"));
-        GLES20.glDisableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId,"a_textCoord"));
+        GLES20.glDisableVertexAttribArray(positionHandler);
+        GLES20.glDisableVertexAttribArray(textureHandler);
         GLES20.glUseProgram(0);
     }
 

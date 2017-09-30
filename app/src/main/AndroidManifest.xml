@@ -18,7 +18,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MyCameraActivity" />
-        <activity android:name=".PictureActivity"></activity>
+        <activity android:name=".PictureActivity" />
+        <activity android:name=".CubeActivity"></activity>
     </application>
 
 </manifest>
