@@ -25,9 +25,9 @@ public class Cube {
     private int mProgramId;
     private int mTextureId;
 
-    private float[] mModelMatrix = new float[16];
-    private float[] mViewMatrix = new float[16];
-    private float[] mProjectionMatrix = new float[16];
+    private float[] mModelMatrix = new float[16];//model变换矩阵
+    private float[] mViewMatrix = new float[16];//view变换矩阵
+    private float[] mProjectionMatrix = new float[16];//4x4矩阵 投影用。 Projection：投影。
     private float[] mMVPMatrix = new float[16];
 
     public void init(){
@@ -44,16 +44,19 @@ public class Cube {
     }
 
     public void onSurfaceCreated() {
+        //eye 表示 camera/viewer 的位置
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
         final float eyeZ = -0.5f;
 
         // We are looking toward the distance
+        //look 表示相机或眼睛的焦点
         final float lookX = 0.0f;
         final float lookY = 0.0f;
         final float lookZ = -5.0f;
 
         // Set our up vector. This is where our head would be pointing were we holding the camera.
+        //up 表示 eye 的正上方向，注意 up 只表示方向，与大小无关
         final float upX = 0.0f;
         final float upY = 1.0f;
         final float upZ = 0.0f;
@@ -61,6 +64,8 @@ public class Cube {
         // Set the view matrix. This matrix can be said to represent the camera position.
         // NOTE: In OpenGL 1, a ModelView matrix is used, which is a combination of a model and
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
+        // 通过调用此函数，就能够设定观察的场景，在这个场景中的物体就会被 OpenGL 处理。
+        // 在 OpenGL 中，eye 的默认位置是在原点，指向 Z 轴的负方向（屏幕往里），up 方向为 Y 轴的正方向。
         Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
 
         Log.e(TAG,"mProgramId="+mProgramId);
@@ -83,28 +88,21 @@ public class Cube {
             return;
         }
 
-        long time = System.currentTimeMillis()%1000L;
-        float angleInDegrees = (360.0f / 1000.0f) * ((int) time);
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 1.0f, 1.0f, 0.0f);
+        long time = System.currentTimeMillis()%10000L;
+        float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
+        Matrix.setIdentityM(mModelMatrix, 0); //初始化矩阵
+        Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);//给矩阵设置位移
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);//给矩阵设置旋转,最后三个参数为旋转轴
+
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+
+        GLES20.glUseProgram(mProgramId);
 
         int mvpMatrixHandler = GLES20.glGetUniformLocation(mProgramId,"u_MVPMatrix");
         int positionHandler = GLES20.glGetAttribLocation(mProgramId, "a_position");
         int textCoordHandler = GLES20.glGetAttribLocation(mProgramId, "a_textCoord");
         int sampleTextureHandler = GLES20.glGetUniformLocation(mProgramId, "u_sampleTexture");
-        Log.e(TAG,"mvpMatrixHandler="+mvpMatrixHandler);
-        Log.e(TAG,"positionHandler="+positionHandler);
-        Log.e(TAG,"textCoordHandler="+textCoordHandler);
-        Log.e(TAG,"sampleTextureHandler="+sampleTextureHandler);
-
-        GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT|GLES20.GL_COLOR_BUFFER_BIT);
-
-        GLES20.glUseProgram(mProgramId);
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);//激活GL_TEXTURE0纹理层
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,mTextureId);//将纹理内容绘制到GL_TEXTURE0纹理层
-        GLES20.glUniform1i(sampleTextureHandler,0);
-
 
         GLES20.glEnableVertexAttribArray(positionHandler);
         GLES20.glEnableVertexAttribArray(textCoordHandler);
@@ -119,6 +117,11 @@ public class Cube {
         Matrix.multiplyMM(mMVPMatrix,0,mViewMatrix,0,mModelMatrix,0);
         Matrix.multiplyMM(mMVPMatrix,0,mProjectionMatrix,0,mMVPMatrix,0);
         GLES20.glUniformMatrix4fv(mvpMatrixHandler,1,false,mMVPMatrix,0);
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);//激活GL_TEXTURE0纹理层
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,mTextureId);//将纹理内容绘制到GL_TEXTURE0纹理层
+        GLES20.glUniform1i(sampleTextureHandler,0);
+
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES,0,36);
 
         GLES20.glDisableVertexAttribArray(positionHandler);
@@ -128,13 +131,12 @@ public class Cube {
 
     private static final String VERTEX_SHADER =
             "uniform mat4 u_MVPMatrix;" +
-            "attribute vec4 a_position;" +
+            "attribute vec3 a_position;" +
             "attribute vec2 a_textCoord;"+
             "varying vec2 v_textCoord;"+
             "void main()" +
             "{" +
-//            "    gl_Position = vec4(a_position.x, a_position.y, a_position.z, 1.0);" +
-            "    gl_Position = u_MVPMatrix * a_position;" +
+            "    gl_Position = u_MVPMatrix * vec4(a_position.x, a_position.y, a_position.z, 1.0);" +
             "    v_textCoord = a_textCoord;"+
             "}";
 
@@ -152,7 +154,42 @@ public class Cube {
             1f,0f,
             0f,1f,
             1f,1f,
-            1f,0f
+            1f,0,
+
+            0f,0f,
+            0f,1f,
+            1f,0f,
+            0f,1f,
+            1f,1f,
+            1f,0f,
+
+            0f,0f,
+            0f,1f,
+            1f,0f,
+            0f,1f,
+            1f,1f,
+            1f,0f,
+
+            0f,0f,
+            0f,1f,
+            1f,0f,
+            0f,1f,
+            1f,1f,
+            1f,0f,
+
+            0f,0f,
+            0f,1f,
+            1f,0f,
+            0f,1f,
+            1f,1f,
+            1f,0f,
+
+            0f,0f,
+            0f,1f,
+            1f,0f,
+            0f,1f,
+            1f,1f,
+            1f,0f,
     };
 
     private static final float[] VERTEX_ARRAY = {

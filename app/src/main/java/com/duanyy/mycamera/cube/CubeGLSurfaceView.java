@@ -41,7 +41,7 @@ public class CubeGLSurfaceView extends GLSurfaceView implements GLSurfaceView.Re
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mCube.init();
-        mCube.setBitmap(getResources(), R.mipmap.icon_test);
+        mCube.setBitmap(getResources(), R.mipmap.icon_cube);
         mCube.onSurfaceCreated();
     }
 
