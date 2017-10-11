@@ -155,8 +155,12 @@ public class Cube {
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
-//        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
 
+        //获得透视投影矩阵
+        // http://blog.csdn.net/liyuanjinglyj/article/details/46652909
+        //Android的Matrix类为它准备了两个方法------frustumM()和perspectiveM()。
+        //perspectiveM()只是从Android的ICS版本开始才被引入，在早期的Android版本里并没有这个方法。
+//        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
         Matrix.perspectiveM(mProjectionMatrix, 0, 45.0f, width / (float)height, 0.1f, 100.0f);
     }
 
