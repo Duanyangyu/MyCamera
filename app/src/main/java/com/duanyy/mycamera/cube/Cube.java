@@ -43,11 +43,23 @@ public class Cube {
         Log.e(TAG,"mTextureId="+mTextureId);
     }
 
+    public void updateViewMatrixEye(float eyeX,float eyeY,float eyeZ){
+        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, 0.0f, 0.0f, -5.0f, 0.0f, 1.0f, 0.0f);
+    }
+
+    public void updateViewMatrixLook(float lookX,float lookY,float lookZ){
+        Matrix.setLookAtM(mViewMatrix,0,0.0f,0.0f,1f,lookX,lookY,lookZ,0.0f,1.0f,0.0f);
+    }
+
+    public void updateViewMatrixUp(float upX,float upY,float upZ){
+        Matrix.setLookAtM(mViewMatrix,0,0.0f,0.0f,1f,0.0f,0.0f,-5.0f,upX,upY,upZ);
+    }
+
     public void onSurfaceCreated() {
         //eye 表示 camera/viewer 的位置
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
-        final float eyeZ = -0.5f;
+        final float eyeZ = 1f;
 
         // We are looking toward the distance
         //look 表示相机或眼睛的焦点
@@ -92,7 +104,7 @@ public class Cube {
         float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
         Matrix.setIdentityM(mModelMatrix, 0); //初始化矩阵
         Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);//给矩阵设置位移
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);//给矩阵设置旋转,最后三个参数为旋转轴
+//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);//给矩阵设置旋转,最后三个参数为旋转轴
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);

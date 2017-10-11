@@ -38,6 +38,21 @@ public class CubeGLSurfaceView extends GLSurfaceView implements GLSurfaceView.Re
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
+    public void updateViewMatrixEye(float eyeX,float eyeY,float eyeZ){
+        mCube.updateViewMatrixEye(eyeX,eyeY,eyeZ);
+        requestRender();
+    }
+
+    public void updateViewMatrixLook(float lookX,float lookY,float lookZ){
+        mCube.updateViewMatrixLook(lookX,lookY,lookZ);
+        requestRender();
+    }
+
+    public void updateViewMatrixUp(float upX,float upY,float upZ){
+        mCube.updateViewMatrixEye(upX,upY,upZ);
+        requestRender();
+    }
+
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mCube.init();
