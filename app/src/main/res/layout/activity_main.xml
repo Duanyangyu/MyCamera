@@ -31,6 +31,16 @@
         android:layout_height="wrap_content"
         android:text="Cube"/>
 
+    <Button
+        android:id="@+id/mBtnCubeViewMatrix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cube ViewMatrix"/>
 
+    <Button
+        android:id="@+id/mBtnCubeProjectionMatrix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cube ProjectionMatrix"/>
 
 </LinearLayout>

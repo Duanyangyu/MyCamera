@@ -5,6 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.duanyy.mycamera.cube.CubeActivity;
+import com.duanyy.mycamera.cube.CubeActivity1;
+import com.duanyy.mycamera.cube.CubeActivity2;
+
 public class MainActivity extends Activity {
 
     @Override
@@ -18,6 +22,8 @@ public class MainActivity extends Activity {
         findViewById(R.id.mBtnCamera).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnPicture).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnCube).setOnClickListener(mClickLfistener);
+        findViewById(R.id.mBtnCubeViewMatrix).setOnClickListener(mClickLfistener);
+        findViewById(R.id.mBtnCubeProjectionMatrix).setOnClickListener(mClickLfistener);
     }
 
     private View.OnClickListener mClickLfistener = new View.OnClickListener() {
@@ -35,8 +41,17 @@ public class MainActivity extends Activity {
                         intent.setClass(MainActivity.this,MyCameraActivity.class);
                         startActivity(intent);
                         break;
+
                     case R.id.mBtnCube:
                         intent.setClass(MainActivity.this,CubeActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.mBtnCubeViewMatrix:
+                        intent.setClass(MainActivity.this,CubeActivity1.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.mBtnCubeProjectionMatrix:
+                        intent.setClass(MainActivity.this,CubeActivity2.class);
                         startActivity(intent);
                         break;
                     default:

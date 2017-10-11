@@ -19,7 +19,9 @@
         </activity>
         <activity android:name=".MyCameraActivity" />
         <activity android:name=".PictureActivity" />
-        <activity android:name=".CubeActivity"></activity>
+        <activity android:name=".cube.CubeActivity"></activity>
+        <activity android:name=".cube.CubeActivity1"></activity>
+        <activity android:name=".cube.CubeActivity2"></activity>
     </application>
 
 </manifest>

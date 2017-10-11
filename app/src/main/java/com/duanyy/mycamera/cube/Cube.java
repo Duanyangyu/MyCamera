@@ -55,6 +55,8 @@ public class Cube {
         Matrix.setLookAtM(mViewMatrix,0,0.0f,0.0f,1f,0.0f,0.0f,-5.0f,upX,upY,upZ);
     }
 
+
+
     public void onSurfaceCreated() {
         //eye 表示 camera/viewer 的位置
         final float eyeX = 0.0f;
@@ -78,13 +80,74 @@ public class Cube {
         // view matrix. In OpenGL 2, we can keep track of these matrices separately if we choose.
         // 通过调用此函数，就能够设定观察的场景，在这个场景中的物体就会被 OpenGL 处理。
         // 在 OpenGL 中，eye 的默认位置是在原点，指向 Z 轴的负方向（屏幕往里），up 方向为 Y 轴的正方向。
-        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+//        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
+        Matrix.setLookAtM(mViewMatrix, 0, 3.0f, 3.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
         Log.e(TAG,"mProgramId="+mProgramId);
     }
 
+    public void updateProjectionMatrixTop(float top){
+        final float ratio = (float) mWidth / mHeight;
+        final float left = -ratio;
+        final float right = ratio;
+        final float bottom = -1.0f;
+        final float near = 1.0f;
+        final float far = 10.0f;
+        if (top == bottom){
+            top *= 1.1f;
+        }
+        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+    }
+
+    public void updateProjectionMatrixBottom(float bottom){
+        final float ratio = (float) mWidth / mHeight;
+        final float left = -ratio;
+        final float right = ratio;
+        final float top = 1.0f;
+        final float near = 1.0f;
+        final float far = 10.0f;
+        if (bottom == top){
+            bottom *= 0.99f;
+        }
+        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+    }
+
+    public void updateProjectionMatrixNear(float near){
+        final float ratio = (float) mWidth / mHeight;
+        final float left = -ratio;
+        final float right = ratio;
+        final float top = 1.0f;
+        final float bottom = -1.0f;
+        final float far = 10.0f;
+        if (near == far){
+            near *= 0.99f;
+        }
+        if (near <= 0){
+            near = 0.00001f;
+        }
+        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+    }
+
+    public void updateProjectionMatrixFar(float far){
+        final float ratio = (float) mWidth / mHeight;
+        final float left = -ratio;
+        final float right = ratio;
+        final float top = 1.0f;
+        final float bottom = -1.0f;
+        final float near = 1.0f;
+        if (far == near){
+            far *= 1.1f;
+        }
+        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+    }
+
+    private int mWidth;
+    private int mHeight;
     public void onSurfaceChanged(int width, int height) {
         GLES20.glViewport(0, 0, width, height);
+        this.mWidth = width;
+        this.mHeight = height;
+
         final float ratio = (float) width / height;
         final float left = -ratio;
         final float right = ratio;
@@ -92,7 +155,9 @@ public class Cube {
         final float top = 1.0f;
         final float near = 1.0f;
         final float far = 10.0f;
-        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+//        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+
+        Matrix.perspectiveM(mProjectionMatrix, 0, 45.0f, width / (float)height, 0.1f, 100.0f);
     }
 
     public void draw(){
@@ -104,7 +169,8 @@ public class Cube {
         float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
         Matrix.setIdentityM(mModelMatrix, 0); //初始化矩阵
         Matrix.translateM(mModelMatrix, 0, 0.0f, 0.0f, -5.0f);//给矩阵设置位移
-//        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);//给矩阵设置旋转,最后三个参数为旋转轴
+        Log.e(TAG,"angleInDegrees="+angleInDegrees);
+        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 1.0f, 0.0f);//给矩阵设置旋转,最后三个参数为旋转轴
 
         GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);

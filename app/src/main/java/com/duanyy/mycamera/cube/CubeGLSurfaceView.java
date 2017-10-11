@@ -53,6 +53,26 @@ public class CubeGLSurfaceView extends GLSurfaceView implements GLSurfaceView.Re
         requestRender();
     }
 
+    public void updateProjectionMatrixTop(float top){
+        mCube.updateProjectionMatrixTop(top);
+        requestRender();
+    }
+
+    public void updateProjectionMatrixBottom(float bottom){
+        mCube.updateProjectionMatrixBottom(bottom);
+        requestRender();
+    }
+
+    public void updateProjectionMatrixNear(float near){
+        mCube.updateProjectionMatrixNear(near);
+        requestRender();
+    }
+
+    public void updateProjectionMatrixFar(float far){
+        mCube.updateProjectionMatrixFar(far);
+        requestRender();
+    }
+
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mCube.init();

@@ -1,4 +1,4 @@
-package com.duanyy.mycamera;
+package com.duanyy.mycamera.cube;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -9,11 +9,13 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.duanyy.mycamera.R;
-import com.duanyy.mycamera.cube.CubeGLSurfaceView;
 
-public class CubeActivity extends Activity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+/**
+ * 拖动配置ViewMatrix。
+ */
+public class CubeActivity1 extends Activity implements SeekBar.OnSeekBarChangeListener, View.OnClickListener {
 
-    private static final String TAG = "CubeActivity";
+    private static final String TAG = "CubeActivity1";
 
     private CubeGLSurfaceView mCubeGLSurfaceView;
     private TextView mTextView;
@@ -26,7 +28,7 @@ public class CubeActivity extends Activity implements SeekBar.OnSeekBarChangeLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cube);
+        setContentView(R.layout.activity_cube_1);
 
         initView();
     }
