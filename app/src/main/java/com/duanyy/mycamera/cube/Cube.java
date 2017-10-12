@@ -161,6 +161,14 @@ public class Cube {
         //Android的Matrix类为它准备了两个方法------frustumM()和perspectiveM()。
         //perspectiveM()只是从Android的ICS版本开始才被引入，在早期的Android版本里并没有这个方法。
 //        Matrix.frustumM(mProjectionMatrix, 0, left, right, bottom, top, near, far);
+
+        /**
+         * m：存储透视投影矩阵
+         offset：偏移量，一般为0
+         fovy：视野角度，小于180度，角度越小视野越窄
+         zNear：到近处平面距离，必须为正值。比如，如果此值为1，那近处平面就位于一个z值为-1处
+         zFar：到远处平面的距离，必须为正值且大于zNear值
+         */
         Matrix.perspectiveM(mProjectionMatrix, 0, 45.0f, width / (float)height, 0.1f, 100.0f);
     }
 
