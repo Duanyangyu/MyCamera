@@ -3,6 +3,8 @@ package com.duanyy.mycamera.camera;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 
+import com.duanyy.mycamera.glutil.OpenGlUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -61,8 +63,7 @@ public class DirectVideo
 
     private int texture;
 
-    public DirectVideo(int texture)
-    {
+    public DirectVideo(int texture){
         this.texture = texture;
 
         // initialize vertex byte buffer for shape coordinates
@@ -85,13 +86,7 @@ public class DirectVideo
         textureVerticesBuffer.put(textureVertices);
         textureVerticesBuffer.position(0);
 
-        int vertexShader    = CameraGLSurfaceview.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader  = CameraGLSurfaceview.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
-
-        mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);                  // creates OpenGL ES program executables
+        mProgram = OpenGlUtils.loadProgram(vertexShaderCode,fragmentShaderCode);
     }
 
     public void draw()

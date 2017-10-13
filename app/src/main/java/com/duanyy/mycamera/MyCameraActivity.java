@@ -40,7 +40,7 @@ public class MyCameraActivity extends Activity {
     }
 
     private boolean checkPermission(){
-        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE);
+        int permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         if (permission == PackageManager.PERMISSION_GRANTED){
             return true;
         }else {

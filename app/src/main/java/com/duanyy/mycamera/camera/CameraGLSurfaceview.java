@@ -10,6 +10,8 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 
+import com.duanyy.mycamera.R;
+import com.duanyy.mycamera.cube.Cube;
 import com.duanyy.mycamera.utils.CamParaUtil;
 
 import java.io.IOException;
@@ -33,6 +35,7 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
     private int mTextureId;
     private SurfaceTexture mSurfaceTexture;
     private DirectVideo mDirectVideo;
+    private Overlay mOverLay;
 
     public CameraGLSurfaceview(Context context) {
         this(context, null);
@@ -64,6 +67,12 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         mSurfaceTexture.setOnFrameAvailableListener(mFrameAvailableListener);
 
         mDirectVideo = new DirectVideo(mTextureId);
+
+        mOverLay = new Overlay();
+        mOverLay.init();
+        mOverLay.setBitmap(getResources(), R.mipmap.icon_cube);
+        mOverLay.onSurfaceCreated();
+
     }
 
     @Override
@@ -73,6 +82,7 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         GLES20.glViewport(0, 0, i, i1);
         openCamera();
         Log.e(TAG,"width="+mWidth+", height="+mHeight);
+        mOverLay.onSurfaceChanged(i,i1);
     }
 
     @Override
@@ -80,6 +90,7 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mSurfaceTexture.updateTexImage();
+        mOverLay.draw(mTextureId);
         mDirectVideo.draw();
     }
 
@@ -142,16 +153,4 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         return texture[0];
     }
 
-    public static int loadShader(int type, String shaderCode){
-
-        // create a vertex shader type (GLES20.GL_VERTEX_SHADER)
-        // or a fragment shader type (GLES20.GL_FRAGMENT_SHADER)
-        int shader = GLES20.glCreateShader(type);
-
-        // add the source code to the shader and compile it
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
-
-        return shader;
-    }
 }

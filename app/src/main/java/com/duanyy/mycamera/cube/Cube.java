@@ -83,6 +83,8 @@ public class Cube {
 //        Matrix.setLookAtM(mViewMatrix, 0, eyeX, eyeY, eyeZ, lookX, lookY, lookZ, upX, upY, upZ);
         Matrix.setLookAtM(mViewMatrix, 0, 3.0f, 3.0f, 10.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 
+        //开启深度测试，否则，或出现立方体前面的面透明的异常现象。From 李兆民提示。
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         Log.e(TAG,"mProgramId="+mProgramId);
     }
 
