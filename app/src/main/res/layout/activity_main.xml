@@ -26,6 +26,12 @@
         android:text="Picture"/>
 
     <Button
+        android:id="@+id/mBtnBuffer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FrameBuffer"/>
+
+    <Button
         android:id="@+id/mBtnCube"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

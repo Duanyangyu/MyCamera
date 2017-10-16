@@ -12,6 +12,7 @@ import android.util.Log;
 
 import com.duanyy.mycamera.R;
 import com.duanyy.mycamera.cube.Cube;
+import com.duanyy.mycamera.glutil.FboHelper;
 import com.duanyy.mycamera.utils.CamParaUtil;
 
 import java.io.IOException;
@@ -53,6 +54,19 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
+    FboHelper mFbo ;
+    private void initFbo(int w,int h){
+        mFbo = new FboHelper(w,h);
+        mFbo.createFbo();
+    }
+
+    private void releaseFbo(){
+        if (mFbo != null) {
+            mFbo.close();
+            mFbo = null;
+        }
+    }
+
     private SurfaceTexture.OnFrameAvailableListener mFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
         @Override
         public void onFrameAvailable(SurfaceTexture surfaceTexture) {
@@ -68,11 +82,13 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
 
         mDirectVideo = new DirectVideo(mTextureId);
 
+        releaseFbo();
+        init();
+
         mOverLay = new Overlay();
         mOverLay.init();
         mOverLay.setBitmap(getResources(), R.mipmap.icon_cube);
         mOverLay.onSurfaceCreated();
-
     }
 
     @Override
@@ -90,8 +106,9 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mSurfaceTexture.updateTexImage();
-        mOverLay.draw(mTextureId);
+
         mDirectVideo.draw();
+        mOverLay.draw(mTextureId);
     }
 
     public void openCamera() {
@@ -108,8 +125,6 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         if(mCamera != null){
             mParams = mCamera.getParameters();
             mParams.setPictureFormat(PixelFormat.JPEG);//设置拍照后存储的图片格式
-//          CamParaUtil.getInstance().printSupportPictureSize(mParams);
-//          CamParaUtil.getInstance().printSupportPreviewSize(mParams);
             //设置PreviewSize和PictureSize
             Camera.Size pictureSize = CamParaUtil.getInstance().getPropPictureSize(
                     mParams.getSupportedPictureSizes(),previewRate, 800);
@@ -120,7 +135,6 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
 
             mCamera.setDisplayOrientation(90);
 
-//          CamParaUtil.getInstance().printSupportFocusMode(mParams);
             List<String> focusModes = mParams.getSupportedFocusModes();
             if(focusModes.contains("continuous-video")){
                 mParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);

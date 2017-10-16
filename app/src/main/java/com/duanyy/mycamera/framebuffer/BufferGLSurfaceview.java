@@ -1,0 +1,135 @@
+package com.duanyy.mycamera.framebuffer;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLES20;
+import android.opengl.GLSurfaceView;
+import android.util.AttributeSet;
+import android.util.Log;
+
+import com.duanyy.mycamera.R;
+import com.duanyy.mycamera.glutil.BufferUtils;
+import com.duanyy.mycamera.glutil.FboHelper;
+import com.duanyy.mycamera.glutil.OpenGlUtils;
+
+import java.nio.FloatBuffer;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+/**
+ * Created by duanyy on 2017/10/16.
+ */
+
+public class BufferGLSurfaceview extends GLSurfaceView implements GLSurfaceView.Renderer {
+
+    public static final String TAG = "BufferGLSurfaceview";
+
+    private Context mContext;
+    private int mProgramId;
+    private FloatBuffer mVertexBuffer;
+    private FloatBuffer mFragmentBuffer;
+    private FboHelper mFbo;
+    private int mTextureId;
+
+    public BufferGLSurfaceview(Context context) {
+        this(context,null);
+    }
+
+    public BufferGLSurfaceview(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        this.mContext = context;
+        init();
+    }
+
+    private void init(){
+        //OpenGL版本设置，这是必须的，否则内容将不会被绘制。
+        setEGLContextClientVersion(2);
+        setRenderer(this);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
+    }
+
+    @Override
+    public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
+        mVertexBuffer = BufferUtils.float2Buffer(VERTEX_ARRAY);
+        mFragmentBuffer = BufferUtils.float2Buffer(FRAGMENT_ARRAY);
+
+        mProgramId = OpenGlUtils.loadProgram(VERTIX_SHADER, FRAGMENT_SHADER);
+        Log.e(TAG,"init programId:"+ mProgramId);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.icon_test);
+        mTextureId = OpenGlUtils.loadTexture(bitmap, -1);
+    }
+
+    @Override
+    public void onSurfaceChanged(GL10 gl10, int w, int h) {
+        mFbo = new FboHelper(w,h);
+        mFbo.createFbo();
+    }
+
+    @Override
+    public void onDrawFrame(GL10 gl10) {
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT|GLES20.GL_DEPTH_BUFFER_BIT);
+
+        GLES20.glUseProgram(mProgramId);
+
+        GLES20.glEnableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId, "a_position"));
+        GLES20.glEnableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId, "a_textCoord"));
+
+        int framebufferId = mFbo.frameId();
+        Log.e(TAG,"framebufferId="+framebufferId);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, framebufferId);
+
+        /**
+         * 离屏渲染：先将内容绘制到缓冲区，再将缓冲区内容一坨绘制进屏幕。
+         * 类比：自定义view，Android双缓冲绘图，先将所有图形加载到内存中，然后一起绘制到屏幕。
+         */
+        //step1:draw content to FrameBuffer.
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,mTextureId);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glUniform1i(GLES20.glGetUniformLocation(mProgramId, "u_sampleTexture"),0);
+        GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(mProgramId, "a_position"),2,GLES20.GL_FLOAT,false,0,mVertexBuffer);
+        GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(mProgramId, "a_textCoord"),2,GLES20.GL_FLOAT,false,0,mFragmentBuffer);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES,0,6);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER,0);
+
+        //step2:draw content to Screen.
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,mFbo.textureId());
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glUniform1i(GLES20.glGetUniformLocation(mProgramId, "u_sampleTexture"),0);
+        GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(mProgramId, "a_position"),2,GLES20.GL_FLOAT,false,0,mVertexBuffer);
+        GLES20.glVertexAttribPointer(GLES20.glGetAttribLocation(mProgramId, "a_textCoord"),2,GLES20.GL_FLOAT,false,0,mFragmentBuffer);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES,0,6);
+
+        GLES20.glDisableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId, "a_position"));
+        GLES20.glDisableVertexAttribArray(GLES20.glGetAttribLocation(mProgramId, "a_textCoord"));
+
+    }
+
+    private static final String VERTIX_SHADER = "uniform mat4 u_MVPMatrix; " +
+            "attribute vec3 a_position;" +
+            "attribute vec2 a_textCoord;"+
+            "varying vec2 v_textCoord;"+
+            "void main()" +
+            "{" +
+            "    gl_Position = vec4(a_position.x, a_position.y, a_position.z, 1.0);" +
+            "    v_textCoord = a_textCoord;"+
+            "}";
+
+    private static final String FRAGMENT_SHADER = "precision mediump float;" +
+            "varying vec2 v_textCoord;"+
+            "uniform sampler2D u_sampleTexture;"+
+            "void main(){" +
+            "  gl_FragColor = texture2D(u_sampleTexture,v_textCoord);" +
+            "}";
+
+    private static final float[] VERTEX_ARRAY = {
+            -1f,-1f,  -1f,1f,  1f,-1f,  -1f,1f,  1f,1f,  1f,-1f
+    };
+
+    private static final float[] FRAGMENT_ARRAY = {
+            0f,0f,  0f,1f,  1f,0f,  0f,1f,  1f,1f,  1f,0f
+    };
+
+}

@@ -8,7 +8,11 @@ import android.view.View;
 import com.duanyy.mycamera.cube.CubeActivity;
 import com.duanyy.mycamera.cube.CubeActivity1;
 import com.duanyy.mycamera.cube.CubeActivity2;
+import com.duanyy.mycamera.framebuffer.BufferActivity;
 
+/**
+ * Created by Duanyy on 2017/9/10.
+ */
 public class MainActivity extends Activity {
 
     @Override
@@ -21,6 +25,7 @@ public class MainActivity extends Activity {
     private void initView(){
         findViewById(R.id.mBtnCamera).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnPicture).setOnClickListener(mClickLfistener);
+        findViewById(R.id.mBtnBuffer).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnCube).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnCubeViewMatrix).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnCubeProjectionMatrix).setOnClickListener(mClickLfistener);
@@ -35,28 +40,26 @@ public class MainActivity extends Activity {
                 switch (id){
                     case R.id.mBtnPicture:
                         intent.setClass(MainActivity.this,PictureActivity.class);
-                        startActivity(intent);
+                        break;
+                    case R.id.mBtnBuffer:
+                        intent.setClass(MainActivity.this, BufferActivity.class);
                         break;
                     case R.id.mBtnCamera:
                         intent.setClass(MainActivity.this,MyCameraActivity.class);
-                        startActivity(intent);
                         break;
-
                     case R.id.mBtnCube:
                         intent.setClass(MainActivity.this,CubeActivity.class);
-                        startActivity(intent);
                         break;
                     case R.id.mBtnCubeViewMatrix:
                         intent.setClass(MainActivity.this,CubeActivity1.class);
-                        startActivity(intent);
                         break;
                     case R.id.mBtnCubeProjectionMatrix:
                         intent.setClass(MainActivity.this,CubeActivity2.class);
-                        startActivity(intent);
                         break;
                     default:
                         break;
                 }
+                startActivity(intent);
             }
 
         }

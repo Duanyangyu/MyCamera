@@ -19,9 +19,10 @@
         </activity>
         <activity android:name=".MyCameraActivity" />
         <activity android:name=".PictureActivity" />
-        <activity android:name=".cube.CubeActivity"></activity>
-        <activity android:name=".cube.CubeActivity1"></activity>
-        <activity android:name=".cube.CubeActivity2"></activity>
+        <activity android:name=".cube.CubeActivity" />
+        <activity android:name=".cube.CubeActivity1" />
+        <activity android:name=".cube.CubeActivity2" />
+        <activity android:name=".framebuffer.BufferActivity"></activity>
     </application>
 
 </manifest>
