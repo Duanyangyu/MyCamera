@@ -11,11 +11,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.duanyy.mycamera.R;
-import com.duanyy.mycamera.cube.Cube;
 import com.duanyy.mycamera.glutil.FboHelper;
 import com.duanyy.mycamera.utils.CamParaUtil;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -36,7 +34,9 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
     private int mTextureId;
     private SurfaceTexture mSurfaceTexture;
     private DirectVideo mDirectVideo;
-    private Overlay mOverLay;
+    private CubeOverlay mCubeOverLay;
+    private BitmapOverlay mBitmapOverlay;
+    private FboHelper mFbo ;
 
     public CameraGLSurfaceview(Context context) {
         this(context, null);
@@ -54,7 +54,7 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
-    FboHelper mFbo ;
+
     private void initFbo(int w,int h){
         mFbo = new FboHelper(w,h);
         mFbo.createFbo();
@@ -82,33 +82,47 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
 
         mDirectVideo = new DirectVideo(mTextureId);
 
-        releaseFbo();
-        init();
+        mCubeOverLay = new CubeOverlay();
+        mCubeOverLay.init();
+        mCubeOverLay.setBitmap(getResources(), R.mipmap.icon_cube);
+        mCubeOverLay.onSurfaceCreated();
 
-        mOverLay = new Overlay();
-        mOverLay.init();
-        mOverLay.setBitmap(getResources(), R.mipmap.icon_cube);
-        mOverLay.onSurfaceCreated();
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl10, int i, int i1) {
-        this.mWidth = i;
-        this.mHeight = i1;
-        GLES20.glViewport(0, 0, i, i1);
+    public void onSurfaceChanged(GL10 gl10, int w, int h) {
+        this.mWidth = w;
+        this.mHeight = h;
+
+        mBitmapOverlay = new BitmapOverlay();
+        mBitmapOverlay.initProgram(mContext);
+        mBitmapOverlay.initFrameBuffer(w,h);
+
+        releaseFbo();
+        initFbo(mWidth,mHeight);
+        mDirectVideo.setFrameBuffer(mFbo);
+        mCubeOverLay.onSurfaceChanged(mWidth,mHeight);
+        GLES20.glViewport(0, 0, mWidth, mHeight);
         openCamera();
         Log.e(TAG,"width="+mWidth+", height="+mHeight);
-        mOverLay.onSurfaceChanged(i,i1);
     }
 
     @Override
     public void onDrawFrame(GL10 gl10) {
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
         mSurfaceTexture.updateTexImage();
 
-        mDirectVideo.draw();
-        mOverLay.draw(mTextureId);
+        int targetTexture = -1;
+
+//        mBitmapOverlay.draw(true);
+//        targetTexture = mBitmapOverlay.getTargetTexture();
+
+        mCubeOverLay.draw(true);
+        targetTexture = mCubeOverLay.getTargetTexture();
+
+        mDirectVideo.draw(targetTexture);
+        Log.e(TAG,"targetTexture="+targetTexture);
+
     }
 
     public void openCamera() {

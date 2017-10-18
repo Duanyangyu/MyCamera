@@ -5,6 +5,7 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
 import com.duanyy.mycamera.R;
+import com.duanyy.mycamera.camera.BitmapOverlay;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -19,6 +20,7 @@ public class PictureGLSurfaceView extends GLSurfaceView implements GLSurfaceView
 
     private Context mContext;
     private Picture mPicture;
+    private BitmapOverlay mBitmapOverlay;
 
     public PictureGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -40,15 +42,19 @@ public class PictureGLSurfaceView extends GLSurfaceView implements GLSurfaceView
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mPicture.init();
         mPicture.setBitmap(getResources(), R.mipmap.icon_test);
+
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-
+        mBitmapOverlay = new BitmapOverlay();
+        mBitmapOverlay.initProgram(mContext);
+        mBitmapOverlay.initFrameBuffer(width,height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         mPicture.draw();
+//        mBitmapOverlay.draw(false);
     }
 }

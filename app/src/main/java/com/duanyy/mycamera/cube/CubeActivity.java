@@ -16,7 +16,7 @@ import com.duanyy.mycamera.R;
  */
 public class CubeActivity extends Activity{
 
-    private static final String TAG = "CubeActivity1";
+    private static final String TAG = "CubeActivity";
 
     private CubeGLSurfaceView mCubeGLSurfaceView;
 

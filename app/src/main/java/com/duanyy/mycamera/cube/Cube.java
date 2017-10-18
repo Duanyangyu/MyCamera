@@ -191,9 +191,9 @@ public class Cube {
 
         GLES20.glUseProgram(mProgramId);
 
-        int mvpMatrixHandler = GLES20.glGetUniformLocation(mProgramId,"u_MVPMatrix");
         int positionHandler = GLES20.glGetAttribLocation(mProgramId, "a_position");
         int textCoordHandler = GLES20.glGetAttribLocation(mProgramId, "a_textCoord");
+        int mvpMatrixHandler = GLES20.glGetUniformLocation(mProgramId,"u_MVPMatrix");
         int sampleTextureHandler = GLES20.glGetUniformLocation(mProgramId, "u_sampleTexture");
 
         GLES20.glEnableVertexAttribArray(positionHandler);

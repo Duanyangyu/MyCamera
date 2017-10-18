@@ -95,7 +95,7 @@ public class Picture {
     }
 
     public void draw(){
-        if (mTextureId == 0) {
+        if (mTextureId < 0) {
             return;
         }
 
