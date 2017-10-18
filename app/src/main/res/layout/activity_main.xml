@@ -49,4 +49,10 @@
         android:layout_height="wrap_content"
         android:text="Cube ProjectionMatrix"/>
 
+    <Button
+        android:id="@+id/mBtnAudioRecord"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Audio Record"/>
+
 </LinearLayout>

@@ -3,6 +3,8 @@
     package="com.duanyy.mycamera">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -22,7 +24,8 @@
         <activity android:name=".cube.CubeActivity" />
         <activity android:name=".cube.CubeActivity1" />
         <activity android:name=".cube.CubeActivity2" />
-        <activity android:name=".framebuffer.BufferActivity"></activity>
+        <activity android:name=".framebuffer.BufferActivity" />
+        <activity android:name=".audio.AudioRecordActivity"></activity>
     </application>
 
 </manifest>

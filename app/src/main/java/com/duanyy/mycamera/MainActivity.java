@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.duanyy.mycamera.audio.AudioRecordActivity;
 import com.duanyy.mycamera.cube.CubeActivity;
 import com.duanyy.mycamera.cube.CubeActivity1;
 import com.duanyy.mycamera.cube.CubeActivity2;
@@ -29,6 +30,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.mBtnCube).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnCubeViewMatrix).setOnClickListener(mClickLfistener);
         findViewById(R.id.mBtnCubeProjectionMatrix).setOnClickListener(mClickLfistener);
+        findViewById(R.id.mBtnAudioRecord).setOnClickListener(mClickLfistener);
     }
 
     private View.OnClickListener mClickLfistener = new View.OnClickListener() {
@@ -55,6 +57,9 @@ public class MainActivity extends Activity {
                         break;
                     case R.id.mBtnCubeProjectionMatrix:
                         intent.setClass(MainActivity.this,CubeActivity2.class);
+                        break;
+                    case R.id.mBtnAudioRecord:
+                        intent.setClass(MainActivity.this,AudioRecordActivity.class);
                         break;
                     default:
                         break;
