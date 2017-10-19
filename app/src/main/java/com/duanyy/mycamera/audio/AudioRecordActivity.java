@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.duanyy.mycamera.R;
 import com.duanyy.mycamera.utils.PermissionHelper;
@@ -21,11 +22,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * 使用 AudioRecord 和 MediaPlayer API 完成音频 PCM 数据的采集和播放，并实现读写音频 wav 文件
+ * 使用 AudioRecord 完成音频数据的采集，并实现读写音频 wav 文件
+ * 参考：//https://github.com/Jhuster/AudioDemo
  */
 public class AudioRecordActivity extends Activity {
 
@@ -40,13 +43,15 @@ public class AudioRecordActivity extends Activity {
     private File mAudioFile;
     private boolean isRecording;
     private byte[] mAudioData;
+    private int mDataCount;
 
-    private ReadThread mReadThread;
+    private WriteThread mWriteThread;
 
     private static final String START_RECORD = "Start Record";
     private static final String STOP_RECOEED = "Stop Record";
     private int mSampleSize;
     private int mChannelConfig;
+    private DataOutputStream mDataOutputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +81,7 @@ public class AudioRecordActivity extends Activity {
     private void initAudioRecorder(){
         int audioSource = MediaRecorder.AudioSource.MIC;
         mSampleSize = 44100;
-        mChannelConfig = AudioFormat.CHANNEL_IN_STEREO;
+        mChannelConfig = AudioFormat.CHANNEL_IN_MONO;
         int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
         int bufferSize = AudioRecord.getMinBufferSize(mSampleSize, mChannelConfig,audioFormat);
 
@@ -110,33 +115,56 @@ public class AudioRecordActivity extends Activity {
     private void startRecord(){
         isRecording = true;
         mAudioRecord.startRecording();
-        mAudioFile = new File(getSavePath());
-        if (mReadThread == null) {
-            mReadThread = new ReadThread();
-            mReadThread.start();
-        }
+        startWriteFile();
+        Toast.makeText(this,"start Record~",Toast.LENGTH_SHORT).show();
     }
 
     private void stopRecord(){
         isRecording = false;
-        mAudioRecord.stop();
-        mReadThread = null;
+        if (mAudioRecord != null) {
+            mAudioRecord.stop();
+        }
+        stopWriteFile();
+        Toast.makeText(this,"stop Record~",Toast.LENGTH_SHORT).show();
     }
 
-    private class ReadThread extends Thread{
+    private void startWriteFile(){
+        mAudioFile = new File(getSavePath());
+        if (mWriteThread == null) {
+            mWriteThread = new WriteThread();
+            mWriteThread.start();
+        }
+    }
+
+    private void stopWriteFile(){
+        writeDataSize();
+        if (mDataOutputStream != null) {
+            try {
+                mDataOutputStream.flush();
+                mDataOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mDataOutputStream = null;
+        }
+        mWriteThread = null;
+    }
+
+    private class WriteThread extends Thread{
         @Override
         public void run() {
             super.run();
             try {
                 FileOutputStream fos = new FileOutputStream(mAudioFile);
-                DataOutputStream dataOutputStream = new DataOutputStream(fos);
-                writeHeader(dataOutputStream,0,0,0);
+                mDataOutputStream = new DataOutputStream(fos);
+                writeHeader(mDataOutputStream,0,0,0);
                 while (isRecording){
                     int read = mAudioRecord.read(mAudioData, 0, mAudioData.length);
                     if (read > 0){
-                        dataOutputStream.write(mAudioData,0,read);
+                        mDataOutputStream.write(mAudioData,0,read);
+                        mDataCount += read;
                     }
-                    Log.e(TAG,"read.size="+read);
+                    Log.e(TAG,"read.size="+read+", mDataCount="+mDataCount);
                 }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -146,8 +174,6 @@ public class AudioRecordActivity extends Activity {
 
         }
     }
-
-
 
     private String getSavePath(){
         String name = "MyAudio_"+System.currentTimeMillis()+".wav";
@@ -163,7 +189,6 @@ public class AudioRecordActivity extends Activity {
         return path;
     }
 
-    //https://github.com/Jhuster/AudioDemo
     private boolean writeHeader(DataOutputStream mDataOutputStream,int  sampleRateInHz, int channels, int bitsPerSample) {
         if (mDataOutputStream == null) {
             return false;
@@ -186,6 +211,29 @@ public class AudioRecordActivity extends Activity {
             mDataOutputStream.writeBytes(header.mSubChunk2ID);
             mDataOutputStream.write(intToByteArray(header.mSubChunk2Size), 0, 4);
         } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean writeDataSize() {
+        if (mDataOutputStream == null) {
+            return false;
+        }
+
+        try {
+            RandomAccessFile wavFile = new RandomAccessFile(mAudioFile, "rw");
+            wavFile.seek(WavFileHeader.WAV_CHUNKSIZE_OFFSET);
+            wavFile.write(intToByteArray((mDataCount + WavFileHeader.WAV_CHUNKSIZE_EXCLUDE_DATA)), 0, 4);
+            wavFile.seek(WavFileHeader.WAV_SUB_CHUNKSIZE2_OFFSET);
+            wavFile.write(intToByteArray((mDataCount)), 0, 4);
+            wavFile.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
@@ -228,7 +276,8 @@ public class AudioRecordActivity extends Activity {
         public int mSubChunk2Size = 0;
 
         public WavFileHeader() {
-
+            mByteRate = mSampleRate * mNumChannel * mBitsPerSample / 8;
+            mBlockAlign = (short) (mNumChannel * mBitsPerSample / 8);
         }
 
         public WavFileHeader(int sampleRateInHz, int channels, int bitsPerSample) {

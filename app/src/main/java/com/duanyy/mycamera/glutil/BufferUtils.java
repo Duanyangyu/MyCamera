@@ -47,4 +47,21 @@ public class BufferUtils {
         return shortBuffer;
     }
 
+    //int和short类型和二进制byte[]相互转换。
+    public static byte[] intToByteArray(int data) {
+        return ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(data).array();
+    }
+
+    public static byte[] shortToByteArray(short data) {
+        return ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(data).array();
+    }
+
+    public static short byteArrayToShort(byte[] b) {
+        return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getShort();
+    }
+
+    public static int byteArrayToInt(byte[] b) {
+        return ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
 }
