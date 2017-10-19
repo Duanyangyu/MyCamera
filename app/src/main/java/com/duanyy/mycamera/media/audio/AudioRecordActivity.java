@@ -1,4 +1,4 @@
-package com.duanyy.mycamera.audio;
+package com.duanyy.mycamera.media.audio;
 
 import android.Manifest;
 import android.app.Activity;
@@ -7,6 +7,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
@@ -44,14 +46,16 @@ public class AudioRecordActivity extends Activity {
     private boolean isRecording;
     private byte[] mAudioData;
     private int mDataCount;
+    private long mStartTime;
 
     private WriteThread mWriteThread;
 
-    private static final String START_RECORD = "Start Record";
-    private static final String STOP_RECOEED = "Stop Record";
     private int mSampleSize;
     private int mChannelConfig;
     private DataOutputStream mDataOutputStream;
+
+    private static final String START_RECORD = "Start Record";
+    private static final String STOP_RECOEED = "Stop Record";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +120,7 @@ public class AudioRecordActivity extends Activity {
         isRecording = true;
         mAudioRecord.startRecording();
         startWriteFile();
+        mStartTime = System.currentTimeMillis();
         Toast.makeText(this,"start Record~",Toast.LENGTH_SHORT).show();
     }
 
@@ -125,11 +130,29 @@ public class AudioRecordActivity extends Activity {
             mAudioRecord.stop();
         }
         stopWriteFile();
+        showAudioInfo();
         Toast.makeText(this,"stop Record~",Toast.LENGTH_SHORT).show();
     }
 
+    private void showAudioInfo(){
+        long duration = System.currentTimeMillis()-mStartTime;
+        mTvRecordTime.setText(duration + " ms");
+    }
+
+    private Handler mMainHandler = new Handler(){
+        String info;
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            int read = msg.what;
+            info = "read="+read+",  total:"+mDataCount;
+            mTvRecordSize.setText(info);
+        }
+    };
+
     private void startWriteFile(){
         mAudioFile = new File(getSavePath());
+        mTvRecordPath.setText(mAudioFile.getAbsolutePath());
         if (mWriteThread == null) {
             mWriteThread = new WriteThread();
             mWriteThread.start();
@@ -162,6 +185,7 @@ public class AudioRecordActivity extends Activity {
                     int read = mAudioRecord.read(mAudioData, 0, mAudioData.length);
                     if (read > 0){
                         mDataOutputStream.write(mAudioData,0,read);
+                        mMainHandler.sendEmptyMessage(read);
                         mDataCount += read;
                     }
                     Log.e(TAG,"read.size="+read+", mDataCount="+mDataCount);

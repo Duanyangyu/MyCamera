@@ -48,6 +48,11 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         init();
     }
 
+    public void release(){
+        releaseFbo();
+        releaseCamera();
+    }
+
     private void init() {
         setEGLContextClientVersion(2);
         setRenderer(this);
@@ -129,10 +134,23 @@ public class CameraGLSurfaceview extends GLSurfaceView implements GLSurfaceView.
         try {
             mCamera = Camera.open(0);
             mCamera.setPreviewTexture(mSurfaceTexture);
+            mCamera.setPreviewCallback(new Camera.PreviewCallback() {
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    Log.e(TAG,"onPreviewFrame data.length="+data.length);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
         startPreview(1.f);
+    }
+
+    private void releaseCamera(){
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.release();
+        }
     }
 
     private void startPreview(float previewRate){

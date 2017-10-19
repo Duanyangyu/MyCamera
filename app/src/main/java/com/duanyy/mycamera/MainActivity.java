@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.duanyy.mycamera.audio.AudioRecordActivity;
+import com.duanyy.mycamera.media.audio.AudioRecordActivity;
 import com.duanyy.mycamera.cube.CubeActivity;
 import com.duanyy.mycamera.cube.CubeActivity1;
 import com.duanyy.mycamera.cube.CubeActivity2;

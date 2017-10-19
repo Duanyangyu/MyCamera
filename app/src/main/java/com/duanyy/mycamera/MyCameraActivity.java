@@ -31,12 +31,20 @@ public class MyCameraActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mycamera);
         checkPermission();
-        mCameraGLSurfaceview = (CameraGLSurfaceview) findViewById(R.id.mCameraGLSurfaceview);
+        mCameraGLSurfaceview = findViewById(R.id.mCameraGLSurfaceview);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mCameraGLSurfaceview == null) {
+            mCameraGLSurfaceview.release();
+        }
     }
 
     private boolean checkPermission(){
